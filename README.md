@@ -1,1 +1,1 @@
-# AI-Blind-Assistancce
+# AI-Blind-Assistant
