@@ -3,10 +3,7 @@ from ultralytics import YOLO
 import pyttsx3
 import threading
 import time
-
-# -----------------------------
 # TTS control
-# -----------------------------
 _tts_lock = threading.Semaphore(1)
 last_spoken = {}
 COOLDOWN = 4
@@ -23,20 +20,14 @@ def speak(text, label_key):
                 _tts_lock.release()
 
     threading.Thread(target=_speak, daemon=True).start()
-
-# -----------------------------
 # Load YOLO model
-# -----------------------------
 model = YOLO("yolov8n.pt")
 
 cap = cv2.VideoCapture(0)
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-# -----------------------------
 # Label mapping
-# -----------------------------
 LABEL_MAP = {
     "cell phone": "phone"
 }
@@ -57,10 +48,7 @@ try:
         results = model(frame, conf=CONFIDENCE)
 
         current_objects = set()
-
-        # -----------------------------
         # Detection loop
-        # -----------------------------
         for box in results[0].boxes:
 
             class_id = int(box.cls[0])
@@ -93,15 +81,12 @@ try:
             description = f"{label} {distance} {position}"
 
             current_objects.add(description)
-
-        # -----------------------------
         # Speak new objects with cooldown
-        # -----------------------------
         new_objects = current_objects - previous_objects
 
         for obj in new_objects:
 
-            key = obj.split()[0]  # object label
+            key = obj.split()[0]  
 
             if time.time() - last_spoken.get(key, 0) > COOLDOWN:
 
@@ -113,9 +98,7 @@ try:
 
         previous_objects = current_objects
 
-        # -----------------------------
         # Display overlay
-        # -----------------------------
         display_texts = sorted(current_objects)
 
         annotated_frame = results[0].plot()
@@ -142,4 +125,5 @@ try:
 
 finally:
     cap.release()
+
     cv2.destroyAllWindows()
